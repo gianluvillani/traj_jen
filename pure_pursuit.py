@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 k = 0.1  # look forward gain
 Lfc = 0.05  # look-ahead distance
 Kp = 1.0  # speed proportional gain
-dt = 0.1  # [s]
+dt = 0.005  # [s]
 L = 2.9  # [m] wheel base of vehicle
 
 
