@@ -179,7 +179,7 @@ class trajectory:
 
 
 k = 0.1  # look forward gain
-Lfc = 0.05  # look-ahead distance
+Lfc = 0.01  # look-ahead distance
 Kp = 1.0  # speed proportional gain
 dt = 0.02  # [s]
 L = 2.9  # [m] wheel base of vehicle
@@ -265,8 +265,8 @@ def generate_semi_random_point(r, curr_goal_dot):
     """
     Semi random dot generator for simulation purposes
     """
-    phi_min=-math.pi*0.5
-    phi_max=math.pi*0.5
+    phi_min=-0.5*math.pi
+    phi_max=0.5*math.pi
     phi=np.random.rand()*(phi_max-phi_min)-(phi_max+phi_min)/2
     #rip
     goal_x=math.cos(phi)+curr_goal_dot.x
@@ -290,6 +290,9 @@ def pure_pursuit_sim(x_0, y_0, yaw_0, v_0, cx=0, cy=0):
     traj = car_1.traj
     cx = traj.x_ref
     cy = traj.y_ref
+
+    len_before = len(cx)
+    diff = 0
     plt.plot(cx, cy)
     # 
     
@@ -318,7 +321,7 @@ def pure_pursuit_sim(x_0, y_0, yaw_0, v_0, cx=0, cy=0):
     v = [state.v]
     t = [0.0]
     target_ind = calc_target_index(state, cx, cy)
-    
+    provola = 0
     while True:
         ai = PIDControl(target_speed, state.v) # acceleration command
         di, target_ind = pure_pursuit_control(state, cx, cy, target_ind)
@@ -327,7 +330,7 @@ def pure_pursuit_sim(x_0, y_0, yaw_0, v_0, cx=0, cy=0):
         car_1.carstate.update_state(x= state.x, y= state.y, v=state.v, a=0, yaw=state.yaw)
         new_points = car_1.traj.update_start(car_1.carstate)           
         car_1.move_car(x = state.x, y = state.y, v = state.v, yaw = state.yaw, new_points= new_points)
-        
+        provola = provola +1
         if new_points:
             r = 1
             [goal_x,goal_y]=generate_semi_random_point(r, car_1.traj.return_goal())
@@ -335,6 +338,10 @@ def pure_pursuit_sim(x_0, y_0, yaw_0, v_0, cx=0, cy=0):
             car_1.traj.gen_trajectory()
             cx = traj.x_ref
             cy = traj.y_ref
+            len_after = len(cx)
+            target_ind = calc_target_index(state, cx, cy)
+            di, target_ind = pure_pursuit_control(state, cx, cy, target_ind)
+            #target_speed = 0
             
         time = time + dt
         
