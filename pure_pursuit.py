@@ -178,10 +178,10 @@ class trajectory:
  
 
 
-k = 0.1  # look forward gain
-Lfc = 0.01  # look-ahead distance
-Kp = 1.0  # speed proportional gain
-dt = 0.02  # [s]
+k = 0.05  # look forward gain
+Lfc = 0.2  # look-ahead distance
+Kp = 2.0  # speed proportional gain
+dt = 0.01  # [s]
 L = 2.9  # [m] wheel base of vehicle
 
 
@@ -265,8 +265,8 @@ def generate_semi_random_point(r, curr_goal_dot):
     """
     Semi random dot generator for simulation purposes
     """
-    phi_min=-0.5*math.pi
-    phi_max=0.5*math.pi
+    phi_min=-0.3*math.pi
+    phi_max=0.3*math.pi
     phi=np.random.rand()*(phi_max-phi_min)-(phi_max+phi_min)/2
     #rip
     goal_x=math.cos(phi)+curr_goal_dot.x
@@ -279,12 +279,12 @@ def generate_semi_random_point(r, curr_goal_dot):
 def pure_pursuit_sim(x_0, y_0, yaw_0, v_0, cx=0, cy=0):
     #  target course
     point_1 = dots(x=0, y=0, v=0.1, a=0.0, yaw=math.pi/4)
-    point_2 = dots(x=0.3, y=0.7, v=0.1, a=0.2, yaw = 0.8*math.pi/4)
-    point_3 = dots(x=0.5, y=0.3, v=0.1, a=0.2, yaw = 0.8*math.pi/4)
-    point_4 = dots(x= 1, y=1.2, v=0.1, a=0.2,  yaw = 0.8*math.pi/4)
-    point_5 = dots(x = 2.3, y=0.3, v=0.1, a=0.2, yaw = -0.8*math.pi/4)
-    point_6 = dots(x=3, y=0, v=0.1, a=0.2, yaw = -math.pi/4)
-    waypoints = [point_1, point_2, point_4]
+    point_2 = dots(x=1, y=0.7, v=0.1, a=0.2, yaw = 0.8*math.pi/4)
+    point_3 = dots(x=2, y=0.3, v=0.1, a=0.2, yaw = 0.8*math.pi/4)
+    point_4 = dots(x= 3, y=1.2, v=0.1, a=0.2,  yaw = 0.8*math.pi/4)
+    point_5 = dots(x = 4, y=0.3, v=0.1, a=0.2, yaw = -0.8*math.pi/4)
+    point_6 = dots(x=5, y=0, v=0.1, a=0.2, yaw = -math.pi/4)
+    waypoints = [point_1, point_2, point_4, point_5, point_6]
     # Generate the car and initial trajectory
     car_1 = car(x=x_0, y=y_0, v=v_0, a=0,yaw=0, dist_goal=0.3, dotlist=waypoints)
     traj = car_1.traj
@@ -306,7 +306,7 @@ def pure_pursuit_sim(x_0, y_0, yaw_0, v_0, cx=0, cy=0):
     
     
     '''
-    target_speed = 3.0 / 3.6  # [m/s]
+    target_speed = 10.0 / 3.6  # [m/s]
 
     T = 2000.0  # max simulation time
 
@@ -349,21 +349,21 @@ def pure_pursuit_sim(x_0, y_0, yaw_0, v_0, cx=0, cy=0):
         
         
         #
-        x.append(state.x)
-        y.append(state.y)
-        yaw.append(state.yaw)
-        v.append(state.v)
-        t.append(time)
+#        x.append(state.x)
+#        y.append(state.y)
+#        yaw.append(state.yaw)
+#        v.append(state.v)
+#        t.append(time)
 
         if show_animation:
             plt.cla()
             plt.plot(cx, cy, ".r", label="course")
-            plt.plot(x, y, "-b", label="trajectory")
+            plt.plot(state.x, state.y, "D", label="trajectory")
             plt.plot(cx[target_ind], cy[target_ind], "xg", label="target")
             plt.axis("equal")
             plt.grid(True)
             plt.title("Speed[km/h]:" + str(state.v * 3.6)[:4])
-            plt.pause(0.001)
+            plt.pause(0.01)
         #print('time elapsed')
         #print(T >= time)
         #print('last index')
