@@ -71,20 +71,20 @@ class trajectory:
         """
         Check if car has passed a dot in the trajectory
         """
-        print(curr_dot.x)
-        print(curr_dot.y)
-        print(car_state.x)
-        print(car_state.y)
+        #print(curr_dot.x)
+        #print(curr_dot.y)
+        #print(car_state.x)
+        #print(car_state.y)
         dist = math.sqrt((curr_dot.x - car_state.x) ** 2 + (curr_dot.y - car_state.y) ** 2)
         return dist < self.dist
 
     def update_start(self, car_state):
         self.dotlist[0] = car_state
         if self.close_enough(car_state, self.dotlist[1]):
-            for i in self.dotlist:
-                print(i.x)
-                print(i.y)
-            print('ja')
+            #for i in self.dotlist:
+                #print(i.x)
+                #print(i.y)
+            #print('ja')
             del self.dotlist[1]
             return True
 
@@ -109,7 +109,7 @@ class trajectory:
                 curr_dot = self.dotlist[i]
 
                 goal_dot = self.dotlist[i + 1]
-                print(goal_dot.x)
+                #print(goal_dot.x)
                 # Get the point coordinate, the first one is the car position
 
                 [time, rx, ry, ryaw, rv, ra] = qp.quinic_polynomials_planner(sx=curr_dot.x, sy=curr_dot.y,

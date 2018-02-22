@@ -11,6 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import animation
 from car_gar import *
+import numpy
 
         
     
@@ -21,7 +22,7 @@ k = 0.05  # look forward gain
 Lfc = 0.3  # look-ahead distance
 Kp = 2.0  # speed proportional gain
 dt = 0.01  # [s]
-L = 2.9  # [m] wheel base of vehicle
+L = 1.9  # [m] wheel base of vehicle
 
 
 show_animation = True
@@ -117,12 +118,22 @@ def generate_semi_random_point(r, curr_goal_dot):
     
 def pure_pursuit_sim(x_0, y_0, yaw_0, v_0, cx=0, cy=0):
     #  target course
+    coordinates_x = []
+    coordinates_y = []
+    with open("circuit.dat") as circuit:
+        for line in circuit:
+            line_split = line.split(",")
+            coordinates_x.append(float(line_split[0]))
+            coordinates_y.append(float(line_split[1]))
+            print(line)
+
+
     point_1 = dots(x=0, y=0, v=0.1, a=0.0, yaw=math.pi/4)
-    point_2 = dots(x=1, y=0.7, v=0.1, a=0.2, yaw = 0.8*math.pi/4)
-    point_3 = dots(x=2, y=0.3, v=0.1, a=0.2, yaw = 0.8*math.pi/4)
-    point_4 = dots(x= 3, y=1.2, v=0.1, a=0.2,  yaw = 0.8*math.pi/4)
-    point_5 = dots(x = 4, y=0.3, v=0.1, a=0.2, yaw = -0.8*math.pi/4)
-    point_6 = dots(x=5, y=0, v=0.1, a=0.2, yaw = -math.pi/4)
+    point_2 = dots(x=1, y=0, v=0.1, a=0.2, yaw = 0.8*math.pi/4)
+    point_3 = dots(x=2, y=0.0, v=0.1, a=0.2, yaw = 0.8*math.pi/4)
+    point_4 = dots(x= 4, y=0, v=0.1, a=0.2,  yaw = 0.8*math.pi/4)
+    point_5 = dots(x = 5, y=0, v=0.1, a=0.2, yaw = -0.8*math.pi/4)
+    point_6 = dots(x=6, y=0, v=0.1, a=0.2, yaw = -math.pi/4)
     waypoints = [point_1, point_2, point_4, point_5, point_6]
     # Generate the car and initial trajectory
     car_1 = car(x=x_0, y=y_0, v=v_0, a=0,yaw=0, dist_goal=0.5, dotlist=waypoints)
@@ -145,7 +156,7 @@ def pure_pursuit_sim(x_0, y_0, yaw_0, v_0, cx=0, cy=0):
     
     
     '''
-    target_speed = 13.0 / 3.6  # [m/s]
+    target_speed = 20.0 / 3.6  # [m/s]
 
     T = 2000.0  # max simulation time
 
@@ -171,10 +182,13 @@ def pure_pursuit_sim(x_0, y_0, yaw_0, v_0, cx=0, cy=0):
         #car_1.move_car(x = state.x, y = state.y, v = state.v, yaw = state.yaw, new_points= new_points)
         car_1.move_car(x =cx[target_ind], y=cy[target_ind], v = state.v, yaw = 0, new_points = new_points)
 
-        provola = provola +1
+
         if new_points:
             r = 1
             [goal_x,goal_y]=generate_semi_random_point(r, car_1.traj.return_goal())
+            goal_x = coordinates_x[provola]
+            goal_y = coordinates_y[provola]
+            provola = provola +1
             car_1.traj.update_goal(dots(x = goal_x, y = goal_y, v =0, yaw =0))
             car_1.traj.gen_trajectory()
             cx = traj.x_ref
