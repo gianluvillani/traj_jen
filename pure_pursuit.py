@@ -18,7 +18,7 @@ from car_gar import *
 
 
 k = 0.05  # look forward gain
-Lfc = 0.1  # look-ahead distance
+Lfc = 0.3  # look-ahead distance
 Kp = 2.0  # speed proportional gain
 dt = 0.01  # [s]
 L = 2.9  # [m] wheel base of vehicle
@@ -145,7 +145,7 @@ def pure_pursuit_sim(x_0, y_0, yaw_0, v_0, cx=0, cy=0):
     
     
     '''
-    target_speed = 6.0 / 3.6  # [m/s]
+    target_speed = 13.0 / 3.6  # [m/s]
 
     T = 2000.0  # max simulation time
 
@@ -161,14 +161,16 @@ def pure_pursuit_sim(x_0, y_0, yaw_0, v_0, cx=0, cy=0):
     t = [0.0]
     target_ind = calc_target_index(state, cx, cy)
     provola = 0
-    while True:
+    while time<10:
         ai = PIDControl(target_speed, state.v) # acceleration command
         di, target_ind = pure_pursuit_control(state, cx, cy, target_ind)
         # update states with the control signals computed above
         state = update(state, ai, di)
         car_1.carstate.update_state(x= state.x, y= state.y, v=state.v, a=0, yaw=state.yaw)
         new_points = car_1.traj.update_start(car_1.carstate)           
-        car_1.move_car(x = state.x, y = state.y, v = state.v, yaw = state.yaw, new_points= new_points)
+        #car_1.move_car(x = state.x, y = state.y, v = state.v, yaw = state.yaw, new_points= new_points)
+        car_1.move_car(x =cx[target_ind], y=cy[target_ind], v = state.v, yaw = 0, new_points = new_points)
+
         provola = provola +1
         if new_points:
             r = 1
@@ -190,7 +192,7 @@ def pure_pursuit_sim(x_0, y_0, yaw_0, v_0, cx=0, cy=0):
         #
 #        x.append(state.x)
 #        y.append(state.y)
-#        yaw.append(state.yaw)
+        yaw.append(state.yaw)
 #        v.append(state.v)
 #        t.append(time)
 
@@ -221,7 +223,7 @@ def pure_pursuit_sim(x_0, y_0, yaw_0, v_0, cx=0, cy=0):
         plt.grid(True)
 
         flg, ax = plt.subplots(1)
-        plt.plot(t, [iv * 3.6 for iv in v], "-r")
+        plt.plot(t, [iv * 3.6 for iv in yaw], "-r")
         plt.xlabel("Time[s]")
         plt.ylabel("Speed[km/h]")
         plt.grid(True)
