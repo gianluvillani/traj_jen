@@ -6,18 +6,18 @@ from pycubicspline import *
 
 
 class car:
-    def __init__(self, x, y, v, a, yaw, dotlist, dist_goal):
+    def __init__(self, x, y, v, a, yaw, dotlist, dist_goal, point_list = []):
         self.carstate = dots(x, y, v, a, yaw)
         self.traj = trajectory(dotlist, dist_goal)
-        self.traj.update_start(self.carstate)
+        self.traj.update_start(self.carstate, point_list)
         self.traj.gen_trajectory()
 
-    def move_car(self, x, y, v, yaw, new_points):
+    def move_car(self, x, y, v, yaw, new_points, point_list =[]):
         self.x = x
         self.y = y
         self.v = v
         self.yaw = yaw
-        self.traj.update_start(self.carstate)  # updated only when the car is close enough to the closest waypoint
+        self.traj.update_start(self.carstate, [])  # updated only when the car is close enough to the closest waypoint
         if new_points:
             self.traj.gen_trajectory()  # recompute the trajectory to the actual state
 
@@ -78,17 +78,40 @@ class trajectory:
         dist = math.sqrt((curr_dot.x - car_state.x) ** 2 + (curr_dot.y - car_state.y) ** 2)
         return dist < self.dist
 
-    def update_start(self, car_state):
-        self.dotlist[0] = car_state
+    def update_start(self, car_state, point_list):
+
+        # NEW
+        # Recomputing close. keep continuity in some way
+        #self.dotlist[0] = car_state
+
+        # NEW
+
         if self.close_enough(car_state, self.dotlist[1]):
-            #for i in self.dotlist:
-                #print(i.x)
-                #print(i.y)
-            #print('ja')
+            # for i in self.dotlist:
+            # print(i.x)
+            # print(i.y)
+            # print('ja')
+
+            temp = self.dotlist[1]
             del self.dotlist[1]
+            self.dotlist[0] = temp
+            #point_list = []
+            ''''
+            if len(point_list)!=0:
+                for i in len(point_list):
+                    self.dotlist.insert(1, dots(x=point_list[i+1][0],
+                                            y=point_list[i+1][1], v=0, yaw = 0) )
+                self.dotlist.insert(1, dots(x=point_list[0][0],
+                                            y=point_list[0][1], v=0, yaw = 0))
+            '''
+
+
+
+
             return True
 
         return False
+
 
     def gen_trajectory(self):
         """
@@ -129,7 +152,8 @@ class trajectory:
         if mode == 1:
             x = []
             y = []
-
+            #print(self.dotlist[0].x)
+            #print(self.dotlist[0].y)
             for i in range(len(self.dotlist)):
                 x.append(self.dotlist[i].x)
                 y.append(self.dotlist[i].y)
@@ -147,6 +171,7 @@ class trajectory:
             self.x_ref = rx
             self.y_ref = ry
             self.yaw_ref = ryaw
+            self.kref = rk
 
     def get_next_traj(self):
         return dots(x_vec[0], y_vec[0], 0)

@@ -68,7 +68,7 @@ class trajectory:
         Called each time a new goal point is added
         """
         self.dotlist.append(dot_goal)   
-    def close_enough(self, car_state, curr_dot ):
+    def close_enough(self, car_state, curr_dot):
         """
         Check if car has passed a dot in the trajectory
         """
@@ -76,10 +76,11 @@ class trajectory:
         return dist < self.dist
     
     def update_start(self, car_state):
+        self.dotlist[0] = car_state
         if self.close_enough(car_state, self.dotlist[1]):
             del self.dotlist[1]
             return True
-        self.dotlist[0] = car_state
+
         return False    
     def gen_trajectory(self):
         """
